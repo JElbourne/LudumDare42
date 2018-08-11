@@ -3,39 +3,26 @@
 public class GameController : MonoBehaviour {
 
     public GameObject player;
+    public IntVariable score;
+    public int regularPieceValue = 1;
+    public int unBreakablePieceValue = 5;
     public int matchGoal = 4;
     public int scoreLeveling = 50;
     public float maxPieceDelay = 3f;
     public float minPieceDelay = 0.5f;
-    public float minIndestructableRatio = 0.0f;
+    public float pieceDelayDecrement = 0.5f;
+    public float minIndestructableRatio = 0.1f;
     public float maxIndestructableRatio = 0.25f;
+    public float indestructableIncrement = 0.05f;
     public float destroyPiecesDelay = 0.35f;
+    public int bombRewardScore = 10;
+    public float bombTimeLimit = 5f;
+
     [HideInInspector]
     public float indestructableRatio;
 
     float timeUntilNextPiece = 0f;
     float newPieceDelay;
-    int score = 0;
-
-    public int Score
-    {
-        get
-        {
-            return score;
-        }
-        set
-        {
-            if (score < 0)
-            {
-                score = 0;
-            }
-            else
-            {
-                score = value;
-                Debug.Log("Added to Score: " + score);
-            }
-        }
-    }
 
     #region instance
 
@@ -64,6 +51,7 @@ public class GameController : MonoBehaviour {
     private void Start () {
         newPieceDelay = maxPieceDelay;
         indestructableRatio = minIndestructableRatio;
+        score.value = 0;
         CreateBoard();
         CreatePlayer();
         CheckMatchGoalToBoardSize();
@@ -86,10 +74,11 @@ public class GameController : MonoBehaviour {
 
     private void IncreaseDifficulty()
     {
-        if (score > 0 && (score % scoreLeveling) == 0)
+        if (score.value > 0 && (score.value % scoreLeveling) == 0)
         {
-            newPieceDelay = Mathf.Clamp(newPieceDelay * 0.95f, minPieceDelay, maxPieceDelay);
-            indestructableRatio = Mathf.Clamp(indestructableRatio * 1.05f, minIndestructableRatio, maxIndestructableRatio);
+            score.value++;
+            newPieceDelay = Mathf.Clamp(newPieceDelay - pieceDelayDecrement, minPieceDelay, maxPieceDelay);
+            indestructableRatio = Mathf.Clamp(indestructableRatio + indestructableIncrement, minIndestructableRatio, maxIndestructableRatio);
         }
     }
 
@@ -117,7 +106,6 @@ public class GameController : MonoBehaviour {
         BoardController.instance.CreateBoard();
     }
 
-
     private void CreatePlayer()
     {
         Vector2 boardSize = BoardController.instance.boardSize;
@@ -129,5 +117,4 @@ public class GameController : MonoBehaviour {
     {
         Debug.Log("Game Over!");
     }
-
 }

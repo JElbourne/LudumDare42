@@ -9,13 +9,15 @@ class Tile
     public GameObject gameObject;
     public bool destructable = false;
     public int value = 0;
+    public bool wall = false;
 
-    public Tile(bool _movable, bool _destructable, int _value, GameObject _gameObject)
+    public Tile(bool _movable, bool _destructable, bool _wall, int _value, GameObject _gameObject)
     {
         movable = _movable;
         destructable = _destructable;
         value = _value;
         gameObject = _gameObject;
+        wall = _wall;
     }
 
     public bool IsMovable(Vector3 direction)
@@ -43,12 +45,14 @@ public class BoardController : MonoBehaviour {
 
     public Vector2 boardSize;
     public GameObject obsticle;
+    public GameObject bomb;
 
     public Color wallTint;
     public Color unbreakableTint;
 
     Dictionary<Vector3, Tile> board = new Dictionary<Vector3, Tile>();
     List<Vector3> openSpaces = new List<Vector3>();
+    Vector3 nextSpawnSpace;
 
     #region instance
 
@@ -80,45 +84,66 @@ public class BoardController : MonoBehaviour {
 
     #region Public Methods
 
+    bool FindOpenSpace()
+    {
+        int index = 0;
+        int attempts = 0;
+
+        while (attempts < (boardSize.x * boardSize.y))
+        {
+            index = Random.Range(0, openSpaces.Count);
+            nextSpawnSpace = openSpaces[index];
+            if (nextSpawnSpace != GameController.instance.player.transform.position)
+            {
+                openSpaces.RemoveAt(index);
+                return true;
+            }
+            attempts++;
+        }
+        return false;
+    }
+
+    public void SpawnBomb()
+    {
+        Debug.Log("Spawn Bomb");
+        if (openSpaces.Count < 2)
+            return;
+
+        if (FindOpenSpace())
+        {
+            GameObject obj = Instantiate(bomb, nextSpawnSpace, Quaternion.identity);
+            board[nextSpawnSpace] = new Tile(true, false, false, 0, obj);
+        }
+    }
+
     public bool SpawnNewPiece()
     {
         if (openSpaces.Count < 2)
             return false;
 
-        int attempts = 0;
-        bool foundCoord = false;
-        int index = 0;
-        Vector3 coord = openSpaces[index];
-        
-        while (attempts < (boardSize.x * boardSize.y))
+        if (FindOpenSpace())
         {
-            index = Random.Range(0, openSpaces.Count);
-            coord = openSpaces[index];
-            if (coord != GameController.instance.player.transform.position)
+            GameObject obj = Instantiate(obsticle, nextSpawnSpace, Quaternion.identity);
+            bool destructable = true;
+            int pieceValue = GameController.instance.regularPieceValue;
+            if (Random.value < GameController.instance.indestructableRatio)
             {
-                foundCoord = true;
-                openSpaces.RemoveAt(index);
-                break;
+                destructable = false;
+                obj.GetComponent<SpriteRenderer>().color = unbreakableTint;
+                pieceValue = GameController.instance.unBreakablePieceValue;
             }
+            board[nextSpawnSpace] = new Tile(true, destructable, false, 1, obj);
+            CheckForCompletedLines();
+            return true;
         }
-        if (!foundCoord)
-            return false;
 
-        GameObject obj = Instantiate(obsticle, coord, Quaternion.identity);
-        bool destructable = true;
-        if (Random.value < GameController.instance.indestructableRatio)
-        {
-            destructable = false;
-            obj.GetComponent<SpriteRenderer>().color = unbreakableTint;
-        }
-        board[coord] = new Tile(true, destructable, 1, obj);
-        return true;
+        return false;
     }
 
     public void MoveTile(Vector3 _coord, Vector3 _direction)
     {
         UpdateBoardData(_coord, _direction);
-        BoardController.instance.CheckForCompletedLines();
+        CheckForCompletedLines();
     }
 
     public bool IsWalkable(Vector3 coord)
@@ -135,6 +160,20 @@ public class BoardController : MonoBehaviour {
         return false;
     }
 
+    public bool IsWall(Vector3 _coord)
+    {
+        if (board.ContainsKey(_coord))
+        {
+            return board[_coord].wall;
+        }
+        return false;
+    }
+
+    public bool IsTile(Vector3 _coord)
+    {
+        return board.ContainsKey(_coord);
+    }
+
     public void CreateBoard()
     {
         for(int x = 0; x < boardSize.x; x++)
@@ -146,7 +185,7 @@ public class BoardController : MonoBehaviour {
                 {
                     GameObject obj = Instantiate(obsticle, pos, Quaternion.identity);
                     obj.GetComponent<SpriteRenderer>().color = wallTint;
-                    board[pos] = new Tile(false, false, 0, obj);
+                    board[pos] = new Tile(false, false, true, 0, obj);
                 } else
                 {
                     openSpaces.Add(pos);
@@ -237,17 +276,38 @@ public class BoardController : MonoBehaviour {
     IEnumerator DestroyPieces(List<Vector3> _toBeDestroyed)
     {
         yield return new WaitForSeconds(GameController.instance.destroyPiecesDelay);
+        int scoreMultiplier = DetermineScoreMultiplier(_toBeDestroyed.Count);
+        RemovePiecesFromBoard(_toBeDestroyed, scoreMultiplier);
 
-        foreach(Vector3 coord in _toBeDestroyed)
+        if (scoreMultiplier >= GameController.instance.bombRewardScore)
+            Invoke("SpawnBomb", 2);
+    }
+
+    public void RemovePiecesFromBoard(List<Vector3> _toBeDestroyed, int scoreMultiplier)
+    {
+        
+        foreach (Vector3 coord in _toBeDestroyed)
         {
-            if (board.ContainsKey(coord))
-            {
-                Tile tile = board[coord];
-                board.Remove(coord);
-                openSpaces.Add(coord);
-                GameController.instance.Score += tile.value;
-                Destroy(tile.gameObject);
-            }
+            RemovePieceFromBoard(coord, scoreMultiplier);
         }
+
+    }
+
+    public void RemovePieceFromBoard(Vector3 coord, int scoreMultiplier)
+    {
+        if (board.ContainsKey(coord))
+        {
+            Tile tile = board[coord];
+            board.Remove(coord);
+            openSpaces.Add(coord);
+            GameController.instance.score.value += (tile.value * scoreMultiplier);
+            Destroy(tile.gameObject);
+        }
+    }
+
+    private int DetermineScoreMultiplier(int _matchCount)
+    {
+        int multiplier = _matchCount - GameController.instance.matchGoal + 1;
+        return multiplier;
     }
 }

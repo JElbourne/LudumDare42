@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     private void Start () {
-        Camera.main.GetComponent<FollowPlayer>().Setup(transform);
+        //Camera.main.GetComponent<FollowPlayer>().Setup(transform);
 	}
 
     // Update is called once per frame
@@ -41,11 +41,6 @@ public class PlayerController : MonoBehaviour {
         {
             BoardController.instance.MoveTile(newPos, direction);
             transform.position = newPos;
-            Debug.Log("Is Movable");
-        } else
-        {
-            Debug.Log("Not Walkable or Movable");
         }
-        
     }
 }
