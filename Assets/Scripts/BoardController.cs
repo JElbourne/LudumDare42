@@ -128,6 +128,7 @@ public class BoardController : MonoBehaviour {
                 pieceValue = GameController.instance.unBreakablePieceValue;
             }
             board[nextSpawnSpace] = new Tile(true, destructable, false, pieceValue, obj);
+            GameController.instance.piecesDropped.value++;
             CheckForCompletedLines();
             return true;
         }
@@ -296,7 +297,10 @@ public class BoardController : MonoBehaviour {
             Tile tile = board[coord];
             board.Remove(coord);
             openSpaces.Add(coord);
+            // Update Scores
             GameController.instance.score.value += (tile.value * scoreMultiplier);
+            GameController.instance.destruction.value++;
+            // Destroy the tile game object
             Destroy(tile.gameObject);
         }
     }

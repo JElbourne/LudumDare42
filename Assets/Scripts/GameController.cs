@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour {
 
     public GameObject menuUI;
     public GameObject gameOverUI;
+    public GameObject highScoreFlashUI;
     public GameObject player;
     public IntVariable score;
+    public IntVariable destruction;
+    public IntVariable piecesDropped;
     public int regularPieceValue = 1;
     public int unBreakablePieceValue = 5;
     public int matchGoal = 4;
@@ -25,6 +29,9 @@ public class GameController : MonoBehaviour {
 
     float timeUntilNextPiece = 0f;
     float newPieceDelay;
+    int highScore;
+    int highDestruction;
+    int highDropped;
 
     public enum GameState {
         Menu,
@@ -64,6 +71,7 @@ public class GameController : MonoBehaviour {
         gameState = GameState.Menu;
         gameOverUI.SetActive(false);
         menuUI.SetActive(true);
+        SetHighScores();
     }
 
     // Update is called once per frame
@@ -75,6 +83,10 @@ public class GameController : MonoBehaviour {
         else if(gameState == GameState.Menu)
         {
             MenuUpdate();
+        }
+        else if (gameState == GameState.GameOver)
+        {
+            GameOverUpdate();
         }
     }
 
@@ -91,6 +103,14 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    private void GameOverUpdate()
+    {
+        if (Input.anyKeyDown)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+    }
+
     private void LateUpdate()
     {
         if (gameState == GameState.Play && timeUntilNextPiece <= 0f)
@@ -98,6 +118,13 @@ public class GameController : MonoBehaviour {
             timeUntilNextPiece = newPieceDelay;
             SpawnNewPiece();
         }
+    }
+
+    private void SetHighScores()
+    {
+        highScore = 0;
+        highDropped = 0;
+        highDestruction = 0;
     }
 
     public void NewGame()
@@ -156,6 +183,12 @@ public class GameController : MonoBehaviour {
     {
         gameState = GameState.GameOver;
         gameOverUI.SetActive(true);
+        highScoreFlashUI.SetActive(false);
+        if (score.value > highScore)
+        {
+            highScoreFlashUI.SetActive(true);
+        }
+
         Debug.Log("Game Over!");
     }
 }
