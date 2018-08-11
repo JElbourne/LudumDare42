@@ -76,11 +76,6 @@ public class BoardController : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
     }
     #endregion
-	
-	void Update () {
-        // The game will check for connecting pieces to explode
-		
-	}
 
     #region Public Methods
 
@@ -132,7 +127,7 @@ public class BoardController : MonoBehaviour {
                 obj.GetComponent<SpriteRenderer>().color = unbreakableTint;
                 pieceValue = GameController.instance.unBreakablePieceValue;
             }
-            board[nextSpawnSpace] = new Tile(true, destructable, false, 1, obj);
+            board[nextSpawnSpace] = new Tile(true, destructable, false, pieceValue, obj);
             CheckForCompletedLines();
             return true;
         }
@@ -201,7 +196,8 @@ public class BoardController : MonoBehaviour {
         List<Vector3> toBeDestroyed = new List<Vector3>();
         toBeDestroyed = CheckForCompletedRows(toBeDestroyed, matchGoal);
         toBeDestroyed = CheckForCompletedColumns(toBeDestroyed, matchGoal);
-        StartCoroutine(DestroyPieces(toBeDestroyed));
+        if(toBeDestroyed.Count > 0)
+            StartCoroutine(DestroyPieces(toBeDestroyed));
     }
 
     List<Vector3> CheckForCompletedRows(List<Vector3> _toBeDestroyed, int _matchGoal)
@@ -278,8 +274,8 @@ public class BoardController : MonoBehaviour {
         yield return new WaitForSeconds(GameController.instance.destroyPiecesDelay);
         int scoreMultiplier = DetermineScoreMultiplier(_toBeDestroyed.Count);
         RemovePiecesFromBoard(_toBeDestroyed, scoreMultiplier);
-
-        if (scoreMultiplier >= GameController.instance.bombRewardScore)
+        GameController.instance.IncreaseDifficulty();
+        if (_toBeDestroyed.Count >= GameController.instance.bombRewardScore)
             Invoke("SpawnBomb", 2);
     }
 

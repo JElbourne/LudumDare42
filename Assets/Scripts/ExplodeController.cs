@@ -13,10 +13,13 @@ public class ExplodeController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        countDownTimer -= Time.deltaTime;
-        if (countDownTimer <= 0)
+        if (GameController.instance.gameState == GameController.GameState.Play)
         {
-            ExplodeBomb();
+            countDownTimer -= Time.deltaTime;
+            if (countDownTimer <= 0)
+            {
+                ExplodeBomb();
+            }
         }
 	}
 

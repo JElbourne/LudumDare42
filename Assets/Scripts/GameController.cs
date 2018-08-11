@@ -2,16 +2,18 @@
 
 public class GameController : MonoBehaviour {
 
+    public GameObject menuUI;
+    public GameObject gameOverUI;
     public GameObject player;
     public IntVariable score;
     public int regularPieceValue = 1;
     public int unBreakablePieceValue = 5;
     public int matchGoal = 4;
     public int scoreLeveling = 50;
-    public float maxPieceDelay = 3f;
+    public float maxPieceDelay = 2f;
     public float minPieceDelay = 0.5f;
     public float pieceDelayDecrement = 0.5f;
-    public float minIndestructableRatio = 0.1f;
+    public float minIndestructableRatio = 0.0f;
     public float maxIndestructableRatio = 0.25f;
     public float indestructableIncrement = 0.05f;
     public float destroyPiecesDelay = 0.35f;
@@ -23,6 +25,14 @@ public class GameController : MonoBehaviour {
 
     float timeUntilNextPiece = 0f;
     float newPieceDelay;
+
+    public enum GameState {
+        Menu,
+        Play,
+        GameOver,
+    }
+
+    public GameState gameState;
 
     #region instance
 
@@ -49,37 +59,66 @@ public class GameController : MonoBehaviour {
 
     // Use this for initialization
     private void Start () {
-        newPieceDelay = maxPieceDelay;
+        newPieceDelay = timeUntilNextPiece = maxPieceDelay;
         indestructableRatio = minIndestructableRatio;
-        score.value = 0;
-        CreateBoard();
-        CreatePlayer();
-        CheckMatchGoalToBoardSize();
+        gameState = GameState.Menu;
+        gameOverUI.SetActive(false);
+        menuUI.SetActive(true);
     }
 
     // Update is called once per frame
     private void Update () {
+        if(gameState == GameState.Play)
+        {
+            PlayUpdate();
+        }
+        else if(gameState == GameState.Menu)
+        {
+            MenuUpdate();
+        }
+    }
+
+    private void PlayUpdate()
+    {
         timeUntilNextPiece -= Time.deltaTime;
-        IncreaseDifficulty();
-	}
+    }
+
+    private void MenuUpdate()
+    {
+        if(Input.anyKeyDown)
+        {
+            NewGame();
+        }
+    }
 
     private void LateUpdate()
     {
-        if (timeUntilNextPiece <= 0f)
+        if (gameState == GameState.Play && timeUntilNextPiece <= 0f)
         {
             timeUntilNextPiece = newPieceDelay;
             SpawnNewPiece();
         }
     }
 
-    private void IncreaseDifficulty()
+    public void NewGame()
     {
-        if (score.value > 0 && (score.value % scoreLeveling) == 0)
+        if (gameState != GameState.Play)
         {
-            score.value++;
-            newPieceDelay = Mathf.Clamp(newPieceDelay - pieceDelayDecrement, minPieceDelay, maxPieceDelay);
-            indestructableRatio = Mathf.Clamp(indestructableRatio + indestructableIncrement, minIndestructableRatio, maxIndestructableRatio);
+            gameOverUI.SetActive(false);
+            menuUI.SetActive(false);
+            score.value = 0;
+            CreateBoard();
+            CreatePlayer();
+            CheckMatchGoalToBoardSize();
+            gameState = GameState.Play;
         }
+    }
+
+    public void IncreaseDifficulty()
+    {
+        Debug.Log("Increaing Dificulty");
+        newPieceDelay = Mathf.Clamp(newPieceDelay - pieceDelayDecrement, minPieceDelay, maxPieceDelay);
+        indestructableRatio = Mathf.Clamp(indestructableRatio + indestructableIncrement, minIndestructableRatio, maxIndestructableRatio);
     }
 
     private void CheckMatchGoalToBoardSize()
@@ -115,6 +154,8 @@ public class GameController : MonoBehaviour {
 
     private void GameOver()
     {
+        gameState = GameState.GameOver;
+        gameOverUI.SetActive(true);
         Debug.Log("Game Over!");
     }
 }

@@ -11,21 +11,24 @@ public class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     private void Update () {
-		if(Input.GetKeyDown(KeyCode.UpArrow))
+        if (GameController.instance.gameState == GameController.GameState.Play)
         {
-            Move(0f, 1f);
-        }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            Move(0f, -1f);
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            Move(-1f, 0f);
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            Move(1f, 0f);
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                Move(0f, 1f);
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                Move(0f, -1f);
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                Move(-1f, 0f);
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                Move(1f, 0f);
+            }
         }
     }
 
