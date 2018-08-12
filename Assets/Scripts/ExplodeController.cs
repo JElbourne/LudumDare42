@@ -4,29 +4,35 @@ using UnityEngine;
 
 public class ExplodeController : MonoBehaviour {
 
-    float countDownTimer = 0;
+ //   float countDownTimer = 0;
 
-	// Use this for initialization
-	void Start () {
-        countDownTimer = GameController.instance.bombTimeLimit;
-	}
+	//// Use this for initialization
+	//void Start () {
+ //       countDownTimer = GameController.instance.bombTimeLimit;
+	//}
 	
-	// Update is called once per frame
-	void Update () {
-        if (GameController.instance.gameState == GameController.GameState.Play)
-        {
-            countDownTimer -= Time.deltaTime;
-            if (countDownTimer <= 0)
-            {
-                ExplodeBomb();
-            }
-        }
-	}
+	//// Update is called once per frame
+	//void Update () {
+ //       if (GameController.instance.gameState == GameController.GameState.Play)
+ //       {
+ //           countDownTimer -= Time.deltaTime;
+ //           if (countDownTimer <= 0)
+ //           {
+ //               ExplodeBomb();
+ //           }
+ //       }
+	//}
 
     void ExplodeBomb()
     {
-        List<Vector3> neighbours = GetNeighbours();
-        BoardController.instance.RemovePiecesFromBoard(neighbours, 1);
+        if (GameController.instance.gameState == GameController.GameState.Play)
+        {
+            List<Vector3> neighbours = GetNeighbours();
+
+            FindObjectOfType<AudioController>().Play("BombSound");
+
+            BoardController.instance.RemovePiecesFromBoard(neighbours, 1);
+        }
     }
 
     List<Vector3> GetNeighbours()

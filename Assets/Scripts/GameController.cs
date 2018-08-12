@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameController : MonoBehaviour {
 
     public GameObject menuUI;
     public GameObject gameOverUI;
     public GameObject highScoreFlashUI;
+    public TextMeshProUGUI droppedHighText;
+    public TextMeshProUGUI destroyedHighText;
+    public TextMeshProUGUI scoreHighText;
     public GameObject player;
     public IntVariable score;
     public IntVariable destruction;
@@ -58,9 +62,6 @@ public class GameController : MonoBehaviour {
 
             //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
             Destroy(gameObject);
-
-        //Sets this to not be destroyed when reloading scene
-        DontDestroyOnLoad(gameObject);
     }
     #endregion
 
@@ -72,6 +73,7 @@ public class GameController : MonoBehaviour {
         gameOverUI.SetActive(false);
         menuUI.SetActive(true);
         SetHighScores();
+        ResetInGameScores();
     }
 
     // Update is called once per frame
@@ -122,9 +124,16 @@ public class GameController : MonoBehaviour {
 
     private void SetHighScores()
     {
-        highScore = 0;
-        highDropped = 0;
-        highDestruction = 0;
+        highScore = PlayerPrefs.GetInt("HighScore", 0);
+        highDropped = PlayerPrefs.GetInt("HighDropped", 0);
+        highDestruction = PlayerPrefs.GetInt("HighDestruction", 0);
+    }
+
+    private void ResetInGameScores()
+    {
+        score.value = 0;
+        destruction.value = 0;
+        piecesDropped.value = 0;
     }
 
     public void NewGame()
@@ -179,15 +188,45 @@ public class GameController : MonoBehaviour {
         Instantiate(player, startPos, Quaternion.identity);
     }
 
-    private void GameOver()
+    private void UpdateHighScores()
     {
-        gameState = GameState.GameOver;
-        gameOverUI.SetActive(true);
-        highScoreFlashUI.SetActive(false);
+        // Check and set the high score values
         if (score.value > highScore)
         {
-            highScoreFlashUI.SetActive(true);
+            highScore = score.value;
+            PlayerPrefs.SetInt("HighScore", score.value);
         }
+        if (piecesDropped.value > highDropped)
+        {
+            highScoreFlashUI.SetActive(true);
+            highDropped = piecesDropped.value;
+            PlayerPrefs.SetInt("HighDropped", piecesDropped.value);
+        }
+        if (destruction.value > highDestruction)
+        {
+            highDestruction = destruction.value;
+            PlayerPrefs.SetInt("HighDestruction", destruction.value);
+        }
+    }
+
+    private void GameOver()
+    {
+        // Set game state to game over
+        gameState = GameState.GameOver;
+
+        UpdateHighScores();
+
+        // Set high score text
+        droppedHighText.text = highDropped.ToString();
+        destroyedHighText.text = highDestruction.ToString();
+        scoreHighText.text = highScore.ToString();
+
+        // Play the game over sound
+        FindObjectOfType<AudioController>().Play("GameOver");
+
+        // Turn on the UI elements for a game over
+        gameOverUI.SetActive(true);
+        highScoreFlashUI.SetActive(false);
 
         Debug.Log("Game Over!");
     }

@@ -71,9 +71,6 @@ public class BoardController : MonoBehaviour {
 
             //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
             Destroy(gameObject);
-
-        //Sets this to not be destroyed when reloading scene
-        DontDestroyOnLoad(gameObject);
     }
     #endregion
 
@@ -126,6 +123,11 @@ public class BoardController : MonoBehaviour {
                 destructable = false;
                 obj.GetComponent<SpriteRenderer>().color = unbreakableTint;
                 pieceValue = GameController.instance.unBreakablePieceValue;
+                FindObjectOfType<AudioController>().Play("BlockDropSpecial");
+            }
+            else
+            {
+                FindObjectOfType<AudioController>().Play("BlockDropRegular");
             }
             board[nextSpawnSpace] = new Tile(true, destructable, false, pieceValue, obj);
             GameController.instance.piecesDropped.value++;
@@ -288,6 +290,7 @@ public class BoardController : MonoBehaviour {
             RemovePieceFromBoard(coord, scoreMultiplier);
         }
 
+        FindObjectOfType<AudioController>().Play("BlockDestroy");
     }
 
     public void RemovePieceFromBoard(Vector3 coord, int scoreMultiplier)
