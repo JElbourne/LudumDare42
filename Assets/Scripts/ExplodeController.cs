@@ -4,24 +4,7 @@ using UnityEngine;
 
 public class ExplodeController : MonoBehaviour {
 
- //   float countDownTimer = 0;
-
-	//// Use this for initialization
-	//void Start () {
- //       countDownTimer = GameController.instance.bombTimeLimit;
-	//}
-	
-	//// Update is called once per frame
-	//void Update () {
- //       if (GameController.instance.gameState == GameController.GameState.Play)
- //       {
- //           countDownTimer -= Time.deltaTime;
- //           if (countDownTimer <= 0)
- //           {
- //               ExplodeBomb();
- //           }
- //       }
-	//}
+    public GameObject explosion;
 
     void ExplodeBomb()
     {
@@ -30,7 +13,8 @@ public class ExplodeController : MonoBehaviour {
             List<Vector3> neighbours = GetNeighbours();
 
             FindObjectOfType<AudioController>().Play("BombSound");
-
+            GameObject explodeGO = Instantiate(explosion, transform.position, Quaternion.identity);
+            //explodeGO.GetComponent<ParticleSystem>().Play();
             BoardController.instance.RemovePiecesFromBoard(neighbours, 1);
         }
     }

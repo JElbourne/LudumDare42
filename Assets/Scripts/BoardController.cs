@@ -105,6 +105,7 @@ public class BoardController : MonoBehaviour {
         {
             GameObject obj = Instantiate(bomb, nextSpawnSpace, Quaternion.identity);
             board[nextSpawnSpace] = new Tile(true, false, false, 0, obj);
+            FindObjectOfType<AudioController>().Play("BlockDropSpecial");
         }
     }
 
@@ -123,12 +124,9 @@ public class BoardController : MonoBehaviour {
                 destructable = false;
                 obj.GetComponent<SpriteRenderer>().color = unbreakableTint;
                 pieceValue = GameController.instance.unBreakablePieceValue;
-                FindObjectOfType<AudioController>().Play("BlockDropSpecial");
             }
-            else
-            {
-                FindObjectOfType<AudioController>().Play("BlockDropRegular");
-            }
+
+            FindObjectOfType<AudioController>().Play("BlockDropRegular");
             board[nextSpawnSpace] = new Tile(true, destructable, false, pieceValue, obj);
             GameController.instance.piecesDropped.value++;
             CheckForCompletedLines();
@@ -189,6 +187,18 @@ public class BoardController : MonoBehaviour {
                     openSpaces.Add(pos);
                 }
             }
+        }
+    }
+
+    public void UpdateOpenSpacesWithPlayer(Vector3 newCoord, Vector3 oldCoord)
+    {
+        if(openSpaces.Contains(newCoord))
+        {
+            openSpaces.Remove(newCoord);
+        }
+        if (!openSpaces.Contains(oldCoord))
+        {
+            openSpaces.Add(oldCoord);
         }
     }
 

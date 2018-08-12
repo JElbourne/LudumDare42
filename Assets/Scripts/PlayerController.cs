@@ -37,12 +37,48 @@ public class PlayerController : MonoBehaviour {
         Vector3 direction = new Vector3(x, y, 0);
         if (BoardController.instance.IsWalkable(newPos))
         {
+            BoardController.instance.UpdateOpenSpacesWithPlayer(newPos, transform.position);
             transform.position = newPos;
+            return;
         }
         else if (BoardController.instance.IsMovable(newPos, direction))
         {
             BoardController.instance.MoveTile(newPos, direction);
+            BoardController.instance.UpdateOpenSpacesWithPlayer(newPos, transform.position);
             transform.position = newPos;
+            return;
         }
+
+        // If we got here that means we couldnt move so lets check if we are stuck
+        if (!CheckNeighboursForMoveOption())
+        {
+            GameController.instance.GameOver();
+        }
+    }
+
+    private bool CheckNeighboursForMoveOption()
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (x == 0 && y == 0)
+                    continue;
+
+                Vector3 pos = new Vector3(transform.position.x + x, transform.position.y + y, 0);
+
+                if (BoardController.instance.IsWalkable(pos))
+                    return true;
+                if (BoardController.instance.IsMovable(pos, new Vector3(-1, 0, 0)))
+                    return true;
+                if (BoardController.instance.IsMovable(pos, new Vector3(1, 0, 0)))
+                    return true;
+                if (BoardController.instance.IsMovable(pos, new Vector3(0, -1, 0)))
+                    return true;
+                if (BoardController.instance.IsMovable(pos, new Vector3(0, 1, 0)))
+                    return true;
+            }
+        }
+        return false;
     }
 }

@@ -26,7 +26,6 @@ public class GameController : MonoBehaviour {
     public float indestructableIncrement = 0.05f;
     public float destroyPiecesDelay = 0.35f;
     public int bombRewardScore = 10;
-    public float bombTimeLimit = 5f;
 
     [HideInInspector]
     public float indestructableRatio;
@@ -209,7 +208,7 @@ public class GameController : MonoBehaviour {
         }
     }
 
-    private void GameOver()
+    public void GameOver()
     {
         // Set game state to game over
         gameState = GameState.GameOver;
