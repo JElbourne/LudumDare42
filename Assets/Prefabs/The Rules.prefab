@@ -47,23 +47,18 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: 'You are a miner trapped in a magic cave.
-
-    Use the <Arrow Keys> to Move around the cave.
-
-
-    Watch out for falling debris.
-
-
-    You can push the debris around so I suggest you check what happens if you push
-    4 pieces in a row. Although not every piece that falls will work the same way.
-
-
-    You need to last as long as you can, someone could be on their way to rescue you.
-
-
-    Hint: If you connect a row at some size over 4 a bomb may drop. Play around with
-    the bomb to see what happens, but step back before it explodes.'
+  m_text: "Finding yourself trapped in a small mine shaft deep below the surface,
+    you realise you don't have much time. The ceiling is starting to collapse making
+    this small room even smaller. You are running out of space and need to do something.\r\n\r\nYou
+    realize you can use the <Arrow Keys> to Move around the cave, and even push the
+    boulders around.\r\n\r\nYou had heard tales of this magical cave and its powers
+    to make things disappear, perhaps I am the caves next victim and I will disappear.
+    No, Let's stay positive. The tale mentioned something about if 4 boulders are
+    perfectly aligned in a row they will vanish right before your eyes. Although not
+    every boulder will work the same way.\r\n\r\nIn a burst of self-motivating monologue,
+    you remind yourself that someone will come for you, You just need to survive long
+    enough. Even if they can't get down to you right away, they may be able to assist
+    with dynamite!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
@@ -72,8 +67,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 3036676095
+  m_fontColor: {r: 1, g: 1, b: 1, a: 0.7058824}
   m_enableVertexGradient: 0
   m_fontColorGradient:
     topLeft: {r: 1, g: 1, b: 1, a: 1}
@@ -90,11 +85,11 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 14
+  m_fontSize: 10.15
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 8
+  m_fontSizeMin: 4
   m_fontSizeMax: 14
   m_fontStyle: 0
   m_textAlignment: 257
@@ -131,12 +126,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 0}
-    characterCount: 505
+    characterCount: 902
     spriteCount: 0
-    spaceCount: 106
-    wordCount: 103
+    spaceCount: 163
+    wordCount: 161
     linkCount: 0
-    lineCount: 17
+    lineCount: 22
     pageCount: 1
     materialCount: 1
   m_havePropertiesChanged: 0
