@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    public GameObject dustUpParticles;
+
     // Use this for initialization
     private void Start () {
         //Camera.main.GetComponent<FollowPlayer>().Setup(transform);
@@ -33,12 +35,15 @@ public class PlayerController : MonoBehaviour {
 
     private void Move(float x, float y)
     {
+        Vector3 dustPos = transform.position;
         Vector3 newPos = new Vector3(transform.position.x + x, transform.position.y + y, 0);
         Vector3 direction = new Vector3(x, y, 0);
         if (BoardController.instance.IsWalkable(newPos))
         {
             BoardController.instance.UpdateOpenSpacesWithPlayer(newPos, transform.position);
             transform.position = newPos;
+            AddDustUp(dustPos);
+
             return;
         }
         else if (BoardController.instance.IsMovable(newPos, direction))
@@ -46,6 +51,7 @@ public class PlayerController : MonoBehaviour {
             BoardController.instance.MoveTile(newPos, direction);
             BoardController.instance.UpdateOpenSpacesWithPlayer(newPos, transform.position);
             transform.position = newPos;
+            AddDustUp(dustPos);
             return;
         }
 
@@ -54,6 +60,11 @@ public class PlayerController : MonoBehaviour {
         {
             GameController.instance.GameOver();
         }
+    }
+
+    private void AddDustUp(Vector3 dustPos)
+    {
+        Instantiate(dustUpParticles, dustPos, Quaternion.identity);
     }
 
     private bool CheckNeighboursForMoveOption()

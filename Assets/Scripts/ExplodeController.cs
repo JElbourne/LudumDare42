@@ -13,8 +13,7 @@ public class ExplodeController : MonoBehaviour {
             List<Vector3> neighbours = GetNeighbours();
 
             FindObjectOfType<AudioController>().Play("BombSound");
-            GameObject explodeGO = Instantiate(explosion, transform.position, Quaternion.identity);
-            //explodeGO.GetComponent<ParticleSystem>().Play();
+            Instantiate(explosion, transform.position, Quaternion.identity);
             BoardController.instance.RemovePiecesFromBoard(neighbours, 1);
         }
     }
@@ -27,10 +26,24 @@ public class ExplodeController : MonoBehaviour {
             for (int y = -1; y <= 1; y++)
             {
                 Vector3 pos = new Vector3(transform.position.x + x, transform.position.y + y, 0);
+
+                if (CheckIfPlayerTooClose(pos))
+                    break;
+
                 if (!BoardController.instance.IsWall(pos) && BoardController.instance.IsTile(pos))
                     neighbours.Add(pos);
             }
         }
         return neighbours;
+    }
+
+    private bool CheckIfPlayerTooClose(Vector3 coord)
+    {
+        if (coord == GameController.instance.player.transform.position)
+        {
+            GameController.instance.GameOver();
+            return true;
+        }
+        return false;
     }
 }

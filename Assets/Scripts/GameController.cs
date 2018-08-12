@@ -7,9 +7,12 @@ public class GameController : MonoBehaviour {
     public GameObject menuUI;
     public GameObject gameOverUI;
     public GameObject highScoreFlashUI;
+    public GameObject restartText;
     public TextMeshProUGUI droppedHighText;
     public TextMeshProUGUI destroyedHighText;
     public TextMeshProUGUI scoreHighText;
+    public GameObject playerPrefab;
+    [HideInInspector]
     public GameObject player;
     public IntVariable score;
     public IntVariable destruction;
@@ -26,6 +29,7 @@ public class GameController : MonoBehaviour {
     public float indestructableIncrement = 0.05f;
     public float destroyPiecesDelay = 0.35f;
     public int bombRewardScore = 10;
+    public float waitAfterGameover = 3;
 
     [HideInInspector]
     public float indestructableRatio;
@@ -35,6 +39,8 @@ public class GameController : MonoBehaviour {
     int highScore;
     int highDestruction;
     int highDropped;
+    float gameOverCooldown;
+
 
     public enum GameState {
         Menu,
@@ -68,9 +74,11 @@ public class GameController : MonoBehaviour {
     private void Start () {
         newPieceDelay = timeUntilNextPiece = maxPieceDelay;
         indestructableRatio = minIndestructableRatio;
+        gameOverCooldown = waitAfterGameover;
         gameState = GameState.Menu;
         gameOverUI.SetActive(false);
         menuUI.SetActive(true);
+        restartText.SetActive(false);
         SetHighScores();
         ResetInGameScores();
     }
@@ -94,6 +102,11 @@ public class GameController : MonoBehaviour {
     private void PlayUpdate()
     {
         timeUntilNextPiece -= Time.deltaTime;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            RestartScene();
+        }
     }
 
     private void MenuUpdate()
@@ -106,10 +119,21 @@ public class GameController : MonoBehaviour {
 
     private void GameOverUpdate()
     {
-        if (Input.anyKeyDown)
+        gameOverCooldown -= Time.deltaTime;
+        if (gameOverCooldown <= 0)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            gameOverCooldown = 0f;
+            restartText.SetActive(true);
+            if (Input.anyKeyDown)
+            {
+                RestartScene();
+            }
         }
+    }
+
+    private void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private void LateUpdate()
@@ -151,7 +175,6 @@ public class GameController : MonoBehaviour {
 
     public void IncreaseDifficulty()
     {
-        Debug.Log("Increaing Dificulty");
         newPieceDelay = Mathf.Clamp(newPieceDelay - pieceDelayDecrement, minPieceDelay, maxPieceDelay);
         indestructableRatio = Mathf.Clamp(indestructableRatio + indestructableIncrement, minIndestructableRatio, maxIndestructableRatio);
     }
@@ -184,7 +207,7 @@ public class GameController : MonoBehaviour {
     {
         Vector2 boardSize = BoardController.instance.boardSize;
         Vector3 startPos = new Vector3((boardSize.x - 1) / 2, (boardSize.y - 1) / 2, 0);
-        Instantiate(player, startPos, Quaternion.identity);
+        player = Instantiate(playerPrefab, startPos, Quaternion.identity);
     }
 
     private void UpdateHighScores()

@@ -52,6 +52,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43885f42459088848add328af6027ddf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dustUpParticles: {fileID: 1729093841477742, guid: a32771d80b43bec45a7ef9bc32c39199,
+    type: 2}
 --- !u!212 &212457608483284920
 SpriteRenderer:
   m_ObjectHideFlags: 1
